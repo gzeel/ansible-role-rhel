@@ -1,9 +1,9 @@
 ---
 # Install some packages and upgrade all
-- name: Install epel repo
-  dnf:
-    name: "epel-release"
-    state: latest
+#- name: Install epel repo
+#  dnf:
+#    name: "epel-release"
+#    state: latest
 
 - name: Ensure necessary packages are installed.
   dnf:
