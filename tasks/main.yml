@@ -1,0 +1,51 @@
+---
+# Install some packages and upgrade all
+- name: Install epel repo
+  dnf:
+    name: "epel-release"
+    state: latest
+
+- name: Ensure necessary packages are installed.
+  dnf:
+    name:
+      - wget
+      - unzip
+      - curl
+      - net-tools
+      - vim
+      - rsync
+      - openssh-clients
+    state: present
+
+- name: Install open-vm-tools
+  dnf:
+    name: open-vm-tools
+    state: latest
+  when:
+    - ansible_virtualization_type == "VMware"
+
+- name: Upgrade all packages
+  dnf:
+    name: "*"
+    state: latest
+
+# Fix slow DNS.
+- name: Fix slow DNS (adapted from Bento).
+  lineinfile:
+    dest: /etc/sysconfig/network
+    regexp: '^RES_OPTIONS'
+    line: 'RES_OPTIONS="single-request-reopen"'
+    state: present
+
+# SSH daemon configuration.
+- name: Configure SSH daemon.
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  with_items:
+    - regexp: '^UseDNS'
+      line: 'UseDNS no'
+    - regexp: '^GSSAPIAuthentication'
+      line: 'GSSAPIAuthentication no'
